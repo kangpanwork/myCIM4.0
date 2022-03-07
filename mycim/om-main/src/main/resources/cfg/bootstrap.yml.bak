@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: mycim-service
+  #http请求地址和资源文件映射 /{application.name/config.name}-{profile}.properties
+  #远程仓库的分支
+  cloud:
+    config:
+      label: master
+      #配置文件名
+      name: mycim-service
+      #dev开发环境配置文件 test测试环境 pro正式环境
+      profile: dev
+      #从配置中心读取文件
+      discovery:
+        enabled: true
+        #配置中心的servieId，即服务名 这时发现，在读取配置文件不再写ip地址，而是服务名，这时如果配置服务部署多份，从而高可用
+        service-id: config-service
+eureka:
+  client:
+    service-url.defaultZone: http://localhost:8781/eureka/
+
+#healthy check
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    health:
+      show-details: ALWAYS
+#springboot admin
+info:
+  version: @project.version@
+  name: ${spring.application.name}
+#log
+logging:
+  file: log/mycim/server.log

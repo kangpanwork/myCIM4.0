@@ -1,0 +1,78 @@
+fa:
+  project:
+    prefix: mycim
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: ${SPRING_ACTIVE_FILE:itg}
+  application:
+    name: ${APP_NAME:oms-tms-service}
+  cloud:
+    nacos:
+      username: ${NACOS_USERNAME:oms-dev}
+      password: ${NACOS_PASSWORD:oms123456}
+      server-addr: ${NACOS_ADDRESS:118.123.246.35:28800}
+      discovery:
+        namespace: ${spring.profiles.active}
+      config:
+        namespace: ${spring.profiles.active}
+        extension-configs[0]:
+          data-id: ${NACOS_COMMON_CONFIG:${fa.project.prefix}-oms-common.yml}
+          refresh: ${NACOS_REFRESH:true}
+        extension-configs[1]:
+          data-id: ${fa.project.prefix}-${spring.application.name}-${spring.profiles.active}.yml
+          refresh: ${NACOS_REFRESH:true}
+  ## 默认关闭zipkin
+  zipkin:
+    enable: ${ZIPKIN_ENABLE:false}
+    base-url: ${ZIPKIN_URL:http://124.71.189.239:29411/}
+    compression:
+      enabled: ${ZIPKIN_ENABLED:false}
+    sender:
+      type: ${ZIPKIN_SENDER_TYPE:WEB}
+
+zk:
+  connect-string: 118.123.246.35:2181
+  connection-timeout-ms: 20000
+  lock:
+    suffix:
+      name: default
+  retry-times: 6
+  session-timeout-ms: 60000
+  sleep-between-retries: 5000
+
+mycim:
+  middleware:
+    dispatch:
+      rules:
+        dispatch-by-body:
+          key: txid
+          type: body
+        integration-rule:
+          key: txid
+          type: integration
+    remote:
+      services:
+        # GRPC 配置
+        tms-mcs-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${MCS_URL:localhost:9200}
+          timeout: ${MCS_TIME_OUT:120}
+        tms-oms-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${OMS_URL:localhost:9091}
+          timeout: ${OMS_TIME_OUT:120}
+
+logging:
+  file: logs/${spring.application.name}.log
+  level:
+    root: INFO

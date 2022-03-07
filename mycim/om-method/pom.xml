@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mycim-parent</artifactId>
+        <groupId>com.fa.cim</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>om-method</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fa.cim</groupId>
+            <artifactId>mycim-middleware-standard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fa.cim</groupId>
+            <artifactId>om-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fa.cim</groupId>
+            <artifactId>om-spc-soap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fa.cim</groupId>
+            <artifactId>om-dtos</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fa.cim</groupId>
+            <artifactId>om-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

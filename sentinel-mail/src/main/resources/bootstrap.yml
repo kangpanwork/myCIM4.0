@@ -1,0 +1,45 @@
+fa:
+  project:
+    prefix: mycim
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: ${SPRING_ACTIVE_FILE:itg}
+  application:
+    name: ${APP_NAME:sentinel-mail-service}
+  cloud:
+    nacos:
+      username: ${NACOS_USERNAME:oms-dev}
+      password: ${NACOS_PASSWORD:oms123456}
+      server-addr: ${NACOS_ADDRESS:118.123.246.35:28800}
+      discovery:
+        namespace: ${spring.profiles.active}
+      config:
+        namespace: ${spring.profiles.active}
+        extension-configs[0]:
+          data-id: ${NACOS_COMMON_CONFIG:${fa.project.prefix}-oms-common.yml}
+          refresh: ${NACOS_REFRESH:true}
+        extension-configs[1]:
+          data-id: ${fa.project.prefix}-${spring.application.name}-${spring.profiles.active}.yml
+          refresh: ${NACOS_REFRESH:true}
+  ## 默认关闭zipkin
+  zipkin:
+    enable: ${ZIPKIN_ENABLE:false}
+    base-url: ${ZIPKIN_URL:http://124.71.189.239:29411/}
+    compression:
+      enabled: ${ZIPKIN_ENABLED:false}
+    sender:
+      type: ${ZIPKIN_SENDER_TYPE:WEB}
+  ## exclude cfg 原 application
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+  ## 建议抽取到nacos中
+  config:
+    git:
+      password: myCIM400
+      uri: http://118.123.246.35:53550
+      username: fa-cmguest
+
+
+

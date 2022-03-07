@@ -1,0 +1,170 @@
+fa:
+  project:
+    prefix: mycim
+
+server:
+  servlet:
+    context-path: /oms
+
+# spring 配置
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: ${SPRING_ACTIVE_FILE:itg}
+  application:
+    name: ${APP_NAME:oms-service}
+  cloud:
+    nacos:
+      username: ${NACOS_USERNAME:oms-dev}
+      password: ${NACOS_PASSWORD:oms123456}
+      server-addr: ${NACOS_ADDRESS:118.123.246.35:28800}
+      discovery:
+        namespace: ${spring.profiles.active}
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
+      config:
+        namespace: ${spring.profiles.active}
+        extension-configs[0]:
+          data-id: ${NACOS_COMMON_CONFIG:${fa.project.prefix}-oms-common.yml}
+          refresh: ${NACOS_REFRESH:true}
+        extension-configs[1]:
+          data-id: ${fa.project.prefix}-${spring.application.name}-${spring.profiles.active}.yml
+          refresh: ${NACOS_REFRESH:true}
+  ## 默认关闭zipkin
+  zipkin:
+    enabled: ${ZIPKIN_ENABLE:false}
+    base-url: ${ZIPKIN_URL:http://124.71.189.239:29411/}
+    compression:
+      enabled: ${ZIPKIN_ENABLED:false}
+    sender:
+      type: ${ZIPKIN_SENDER_TYPE:WEB}
+  ## 启动加载 DispatchServlet
+  mvc:
+    servlet:
+      load-on-startup: 1
+  ## 关闭 redis repositories
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+# oms 接口入参/返参扫描包级别控制
+log:
+  #scans: com.fa.cim.method,com.fa.cim.service,com.fa.cim.controller
+  scans:
+
+# logback 日志路径配置
+logging:
+  file: logs/${spring.application.name}.log
+  level:
+    root: INFO
+
+mycim:
+  # 逻辑锁模式，目前支持JPA与REDIS两种模式，注意!!!如果使用REDIS模式则需要额外提供对应的REDIS配置!!!，不然无法正常启动
+  lock:
+    mode: ${MYCIM_LOCK_EXECUTOR:JPA}
+  # 环境变量同步,单位分钟
+  sys:
+    env:
+      sync:
+        interval: ${MYCIM_ENV_SYNC_INTERVAL:1}
+  # 原properties中配置
+  middleware:
+    channels:
+      definitions:
+        oms-channel:
+          queue-name: oms-queue
+          routing-key: oms-routekey
+    dispatch:
+      rules:
+        dispatch-by-body:
+          key: txid
+          type: body
+        integration-rule:
+          key: txid
+          type: integration
+    listener:
+      protocols:
+        rabbitmq:
+          channels:
+            - oms-channel
+          connections:
+            default-exchange: MES_SYNC_EXCHANGE
+            direct-queue-name: QUEUE_FOR_OMS
+            host: ${RABBIT_MQ_LISTENER_HOST:118.123.246.35}
+            port: ${RABBIT_MQ_LISTENER_PORT:5672}
+            password: ${RABBIT_MQ_LISTENER_USERNAME:admin}
+            username: ${RABBIT_MQ_LISTENER_USERNAME:admin}
+    remote:
+      protocols:
+        rabbitmq:
+          connections:
+            default-exchange: ${RABBIT_MQ_EXCHANGE:MES_SYNC_EXCHANGE}
+            host: ${RABBIT_MQ_REMOTE_HOST:118.123.246.35}
+            port: ${RABBIT_MQ_REMOTE_PORT:5672}
+            password: ${RABBIT_MQ_REMOTE_PASSWORD:admin}
+            username: ${RABBIT_MQ_REMOTE_USERNAME:admin}
+          dispatch: header
+          reply: ${RABBIT_MQ_REMOTE_REPLY:oms-reply-routekey}
+      services:
+        # MQ 配置
+        oms-ams-service:
+          protocol: rabbitmq
+          request: ams-routekey
+        oms-apc-service:
+          protocol: rabbitmq
+          request: apc-routekey
+        oms-tcs-service:
+          protocol: rabbitmq
+          request: tcs-routekey
+        # GRPC 配置
+        oms-eap-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${EAP_URL:localhost:9090}
+          timeout: ${EAP_TIME_OUT:60}
+        oms-rtms-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${RTMS_URL:8.141.55.192:9090}
+          timeout: ${RTMS_TIME_OUT:120}
+        oms-new-apc-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${APC_URL:localhost:9099}
+          timeout: ${APC_TIME_OUT:60}
+        oms-ocap-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${OCAP_URL:localhost:9077}
+          timeout: ${OCAP_TIME_OUT:60}
+        oms-spc-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${SPC_URL:124.71.189.239:30138}
+          timeout: ${SPC_TIME_OUT:60}
+        oms-tms-service:
+          connections:
+            connector: com.fa.cim.grpc.adapt.eap.client.GrpcEapConnector
+            stub-builder: com.fa.cim.grpc.definitions.rpcTransportService.RPCTransportServiceGrpc
+          dispatch: integration-rule
+          protocol: simple-grpc
+          request: ${TMS_URL:localhost:9100}
+          timeout: ${TMS_TIME_OUT:120}

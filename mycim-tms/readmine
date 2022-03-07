@@ -1,0 +1,29 @@
+第一次安装问题：
+
+1.提示log 无法编译
+settings >build,execution,deployment>annotation processors >  Enable annotation processing 打勾
+
+2.编译提示缺乏corabjar
+解决：
+
+1.添加本地jar
+cmd > cd 项目目录>lib
+执行：mvn install:install-file "-DgroupId=com.fa.tms.corba" "-DartifactId=com.fa.tms.corba" "-Dversion=1.0" "-Dpackaging=jar" "-Dfile=com.fa.tms.corba-1.0-SNAPSHOT.jar"
+
+mvn install:install-file "-DgroupId=com.fa.cim.tms" "-DartifactId=com.fa.cim.middleware.rabbitmq" "-Dversion=1.0" "-Dpackaging=jar" "-Dfile=com.fa.cim.middleware.rabbitmq-0.0.1-SNAPSHOT.jar"
+2.maven配置文件添加公司私服地址
+本地仓库需要改成公司私服：settings.xml 文件中<mirrors>添加
+私服为第一位置
+ <mirror>
+	        <id>cimNexus</id>
+			 <mirrorOf>*</mirrorOf>
+            <name>cimNexus PLUGIN Repository</name>
+            <url>http://118.112.236.244:28881/repository/maven-public/</url>
+    </mirror>
+
+
+
+
+
+
+

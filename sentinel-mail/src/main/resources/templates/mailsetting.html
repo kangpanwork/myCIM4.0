@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>邮箱设置</title>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+</head>
+<body>
+    <h3>邮箱设置</h3>
+    <h4 th:switch="${isSettingUser}">
+        <span th:case="true">
+            你已设置了帐户，帐户为<span th:text="${userName}"></span> <br/>
+            <span th:switch="${isCanWork}">
+                <span th:case="true">邮箱能正常工作</span>
+                <span th:case="false">邮箱不能正常工作，请重新设置</span>
+            </span>
+        </span>
+        <span th:case="false">你还未设置邮箱帐户，请先设置</span>
+    </h4>
+
+    <form id="form">
+        <div class="form-group">
+            <label for="nickName">Nick Name</label>
+            <input type="text" class="form-control" style="width: 250px" id="nickName" name="nickName" required="required">
+        </div>
+        <div class="form-group">
+            <label for="emailAddress">Email address</label>
+            <input type="email" class="form-control" style="width: 250px" id="emailAddress" name="userName" aria-describedby="emailHelp" required="required">
+        </div>
+        <div class="form-group">
+            <label for="emailPassword">Password</label>
+            <input type="password" class="form-control" style="width: 250px" id="emailPassword" name="password" required="required">
+        </div>
+        <div class="form-group">
+            <label for="emailType">Email Type</label>
+            <select class="form-control" id="emailType" style="width: 250px" name="emailType">
+                <option>qq</option>
+                <option>163</option>
+                <option>ali</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="setEmail()">Submit</button>
+    </form>
+    <script>
+        (function($){
+            $.fn.serializeJson=function(){
+                var serializeObj={};
+                var array=this.serializeArray();
+                var str=this.serialize();
+                $(array).each(function(){
+                    if(serializeObj[this.name]){
+                        if($.isArray(serializeObj[this.name])){
+                            serializeObj[this.name].push(this.value);
+                        }else{
+                            serializeObj[this.name]=[serializeObj[this.name],this.value];
+                        }
+                    }else{
+                        serializeObj[this.name]=this.value;
+                    }
+                });
+                return serializeObj;
+            };
+        })(jQuery);
+        function setEmail() {
+            //请求参数
+            var form = $("#form").serializeJson();
+            var strForm = JSON.stringify(form);
+            $.ajax({
+                //请求方式
+                type : "POST",
+                //请求的媒体类型
+                contentType: "application/json;charset=UTF-8",
+                //请求地址
+                url : "/mail/setEmail",
+                dataType:'json',
+                //数据，json字符串
+                data : strForm,
+                //请求成功
+                success : function(result) {
+                    var ret = result.ret;
+                    if (ret === 0){
+                        alert("update sucess, you can use the email service now");
+                    } else if (ret === -1){
+                        alert("your email is invalid, please check it")
+                    } else if (ret === -2){
+                        alert("system error");
+                    }
+                }
+            });
+        }
+    </script>
+</body>

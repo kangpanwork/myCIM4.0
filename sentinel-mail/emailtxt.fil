@@ -1,0 +1,21 @@
+Cassette Usage Limitation Over
+This is secondary message.
+
+floorEventTimeStamp:2020-06-04 16:52:04<br/>
+messageID:CASTOVER<br/>
+emailAddress:a18280102190@163.com<br/>
+lotID: <br/>
+lotStatus: <br/>
+reasonCode:****<br/>
+userID:neko1<br/>
+operationNumber: <br/>
+operationName: <br/>
+processDefinitionID: <br/>
+equipmentID: <br/>
+routeID: <br/>
+messageText:<<< cassette Usage Limitation Over >>>
+    cassette ID           : ObjectIdentifier(value=CRUP9016, referenceKey=FRCAST.320938750655856640)
+    Start Count           : 100
+    Max Start Count       : 100
+    Passage from PM (min) : 26520896
+    Interval for PM (min) : 0
